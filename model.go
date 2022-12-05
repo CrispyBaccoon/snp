@@ -572,15 +572,21 @@ func (m *Model) selectedSnippet() Snippet {
 
 // selected folder returns the currently selected folder.
 func (m *Model) selectedFolder() Folder {
+	if len(m.Folders.Items()) < 1 {
+		m.Folders.InsertItem(0, defaultSnippet)
+	}
 	item := m.Folders.SelectedItem()
 	if item == nil {
-		return "misc"
+		return defaultSnippetFolder
 	}
 	return item.(Folder)
 }
 
 // List returns the active list.
 func (m *Model) List() *list.Model {
+	if len(m.Lists) < 1 {
+		m.Lists = make(map[Folder]*list.Model)
+	}
 	return m.Lists[m.selectedFolder()]
 }
 
