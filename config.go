@@ -12,7 +12,7 @@ import (
 // At the moment, it is quite limited, only supporting the home folder and the
 // file name of the metadata.
 type Config struct {
-	Root string `env:"SNP_HOME" yaml:"root"`
+	Root string `env:"SNP_ROOT" yaml:"root"`
 
 	DefaultLanguage string `env:"SNP_DEFAULT_LANGUAGE" yaml:"default_language"`
 
