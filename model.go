@@ -593,11 +593,12 @@ func (m *Model) createNewSnippetFile() tea.Cmd {
 			folder = folderItem.FilterValue()
 		}
 
-		file := fmt.Sprintf("%s-snippet-%d.%s", folder, rand.Intn(1000000), m.config.DefaultLanguage)
+		name := fmt.Sprintf("snippet-%d", rand.Intn(1000000))
+		file := fmt.Sprintf("%s.%s", name, m.config.DefaultLanguage)
 		_, _ = os.Create(filepath.Join(m.config.Root, folder, file))
 
 		newSnippet := Snippet{
-			Name:     defaultSnippetName,
+			Name:     name,
 			File:     file,
 			Language: m.config.DefaultLanguage,
 			Folder:   folder,
