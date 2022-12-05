@@ -174,24 +174,36 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.blurInputs()
 				i := m.List().Index()
 				snippet := m.selectedSnippet()
+
+				var newName string
 				if m.inputs[nameInput].Value() != "" {
-					snippet.Name = m.inputs[nameInput].Value()
+					newName = m.inputs[nameInput].Value()
 				} else {
-					snippet.Name = defaultSnippetName
+					newName = defaultSnippetName
 				}
+				var newFolder string
 				if m.inputs[folderInput].Value() != "" {
-					snippet.Folder = m.inputs[folderInput].Value()
+					newFolder = m.inputs[folderInput].Value()
 				} else {
-					snippet.Folder = defaultSnippetFolder
+					newFolder = defaultSnippetFolder
 				}
+				var newLanguage string
 				if m.inputs[languageInput].Value() != "" {
-					snippet.Language = m.inputs[languageInput].Value()
+					newLanguage = m.inputs[languageInput].Value()
 				} else {
-					snippet.Language = m.config.DefaultLanguage
+					newLanguage = m.config.DefaultLanguage
 				}
-				newFile := fmt.Sprintf("%s.%s", snippet.Name, snippet.Language)
-				_ = os.Rename(m.selectedSnippetFilePath(), filepath.Join(m.config.Root, snippet.Folder, newFile))
-				snippet.File = newFile
+
+				if newFolder != snippet.Folder {
+					_ = os.Rename(m.selectedSnippetFilePath(), filepath.Join(m.config.Root, snippet.Folder, snippet.File))
+					snippet.Folder = newFolder
+				}
+				if newLanguage != snippet.Language || newName != snippet.Name {
+					newFile := fmt.Sprintf("%s.%s", snippet.Name, newLanguage)
+					_ = os.Rename(m.selectedSnippetFilePath(), filepath.Join(m.config.Root, snippet.Folder, newFile))
+					snippet.File = newFile
+					snippet.Language = newLanguage
+				}
 				setCmd := m.List().SetItem(i, snippet)
 				m.pane = snippetPane
 				cmd = tea.Batch(setCmd, m.updateFolders(), m.updateContent())
