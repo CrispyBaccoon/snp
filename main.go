@@ -151,27 +151,50 @@ func readConfig() Config {
 // readSnippets returns all the snippets read from the snippets.json file.
 func readSnippets(config Config) []Snippet {
 	var snippets []Snippet
-	/* file := filepath.Join(config.Home, config.File)
-	dir, err := os.ReadFile(file)
+	fd, err := ioutil.ReadDir(config.Root)
 	if err != nil {
-		// File does not exist, create one.
-		err := os.MkdirAll(config.Home, os.ModePerm)
-		if err != nil {
-			fmt.Printf("Unable to create directory %s, %+v", config.Home, err)
-		}
-		f, err := os.Create(file)
-		if err != nil {
-			fmt.Printf("Unable to create file %s, %+v", file, err)
-		}
-		content := fmt.Sprintf(defaultSnippetFileFormat, defaultSnippetFolder, defaultSnippetName, config.DefaultLanguage)
-		_, _ = f.WriteString(content)
-		dir = []byte(content)
-	}
-	err = json.Unmarshal(dir, &snippets)
-	if err != nil {
-		fmt.Printf("Unable to unmarshal %s file, %+v\n", file, err)
 		return snippets
-	} */
+	}
+
+	parseFile := func(d fs.FileInfo, p string) {
+		if d.IsDir() {
+			return
+		}
+		fname := d.Name()
+		str := strings.Split(fname, ".")
+		var name string
+		lan := "txt"
+		if len(str) < 2 {
+			name = str[0]
+		} else {
+			name = strings.Join(str[:len(str)-1], ".")
+			lan = str[len(str)-1]
+		}
+		snippets = append(snippets, Snippet{Name: name, Folder: p, Language: lan})
+	}
+
+	parseDir := func(d fs.FileInfo) {
+		if !d.IsDir() {
+			return
+		}
+		fdd, err := ioutil.ReadDir(filepath.Join(config.Root, d.Name()))
+		if err != nil {
+			return
+		}
+		for _, dd := range fdd {
+			if !dd.IsDir() {
+				parseFile(dd, d.Name())
+			}
+		}
+	}
+
+	for _, d := range fd {
+		if !d.IsDir() {
+			parseFile(d, defaultSnippetFolder)
+		} else {
+			parseDir(d)
+		}
+	}
 	return snippets
 }
 
