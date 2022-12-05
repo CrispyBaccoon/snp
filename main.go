@@ -298,10 +298,9 @@ func runInteractiveMode(config Config, snippets []Snippet) error {
 			newTextInput(defaultSnippetName + " "),
 			newTextInput(config.DefaultLanguage),
 		},
-		tagsInput: newTextInput("Tags"),
 	}
 	p := tea.NewProgram(m, tea.WithAltScreen())
-	model, err := p.StartReturningModel()
+	model, err := p.Run()
 	if err != nil {
 		return err
 	}
