@@ -43,7 +43,6 @@ const (
 	pastingState
 	quittingState
 	editingState
-	editingTagsState
 )
 
 type input int
@@ -77,7 +76,6 @@ type Model struct {
 	// the input for snippet folder, name, language
 	activeInput input
 	inputs      []textinput.Model
-	tagsInput   textinput.Model
 	// the current active pane of focus.
 	pane pane
 	// the current state / action of the application.
